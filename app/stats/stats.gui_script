@@ -1,0 +1,110 @@
+local ____lualib = require("lualib_bundle")
+local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
+local ____exports = {}
+local druid = require("druid.druid")
+local ____utils = require("utils.utils")
+local hide_gui_list = ____utils.hide_gui_list
+local get_nodes = ____utils.get_nodes
+local parse_time = ____utils.parse_time
+local ____Texts = require("game.gui_utility.Texts")
+local Texts = ____Texts.Texts
+local ____array = require("utils.array")
+local array = ____array.array
+local ____settings_utility = require("utils.settings_utility")
+local apply_settings = ____settings_utility.apply_settings
+local ____StatsRecorder = require("stats.StatsRecorder")
+local StatsRecorder = ____StatsRecorder.StatsRecorder
+local ____Header = require("general_components.Header")
+local Header = ____Header.Header
+local druid_comps = {}
+local gui_nodes = {
+    "item/item",
+    "item/date_txt",
+    "item/time_txt",
+    "item/number_txt",
+    "container"
+}
+function ____exports.init(self)
+    local init_layout
+    function init_layout(druid, items)
+        local item, nodes
+        function item(idx, date, time)
+            local item_clone = gui.clone_tree(nodes["item/item"])
+            local item_nodes = get_nodes({"item", "date_txt", "time_txt", "number_txt"}, "item", item_clone)
+            local txts = Texts(item_nodes, "txt", "item", item_clone)
+            txts["item/number_txt"]:set(tostring(idx))
+            txts["item/date_txt"]:set(date, {axis = "x"})
+            txts["item/time_txt"]:set(time, {axis = "x"})
+            gui.set_inherit_alpha(item_nodes.item, false)
+            return item_nodes.item
+        end
+        nodes = get_nodes(gui_nodes)
+        local name_node_container = "container"
+        local container = druid:new_static_grid(name_node_container, "item/item", 1)
+        local container_size = gui.get_size(gui.get_node(name_node_container))
+        local sorted_stats = StatsRecorder.get_sorted()
+        for j = 1, 10 do
+            local record = sorted_stats[j]
+            local item_node = item(
+                j,
+                record.date,
+                record.time ~= 0 and parse_time(record.time) or "---"
+            )
+            local size = gui.get_size(item_node)
+            size.x = container_size.x
+            gui.set_size(item_node, size)
+            items[#items + 1] = item_node
+            container:add(item_node, j)
+        end
+        druid_comps[#druid_comps + 1] = container
+        hide_gui_list({"item/item"})
+    end
+    Manager.init_script()
+    self.druid = druid.new(self)
+    local header = Header(self.druid)
+    header.set_name(Lang.get_text("rating")).set_btn_callback(function()
+        Ads.show_interstitial()
+        Scene.load("menu")
+    end)
+    self.items = {}
+    self.update_ui = function()
+        apply_settings()
+        init_layout(self.druid, self.items)
+        header.on_change_layout()
+    end
+    self:update_ui()
+end
+function ____exports.on_input(self, action_id, action)
+    return self.druid:on_input(action_id, action)
+end
+function ____exports.update(self, dt)
+    self.druid:update(dt)
+end
+function ____exports.on_message(self, message_id, message, sender)
+    if message_id == hash("layout_changed") then
+        __TS__ArrayForEach(
+            druid_comps,
+            function(____, c)
+                self.druid:remove(c)
+            end
+        )
+        __TS__ArrayForEach(
+            self.items,
+            function(____, item) return gui.delete_node(item) end
+        )
+        array.clear(self.items)
+        array.clear(druid_comps)
+        self:update_ui()
+    end
+    self.druid:on_message(message_id, message, sender)
+end
+function ____exports.final(self)
+    Manager.final_script()
+    self.druid:final()
+end
+init = ____exports.init
+on_input = ____exports.on_input
+update = ____exports.update
+on_message = ____exports.on_message
+final = ____exports.final
+

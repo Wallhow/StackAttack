@@ -1,0 +1,92 @@
+name: "ads"
+instances {
+  id: "Ground"
+  prototype: "/assets/prefabs/go/collision/Ground.go"
+  position {
+    x: 480.0
+    y: 3.0
+  }
+}
+instances {
+  id: "camera"
+  prototype: "/orthographic/camera.go"
+  position {
+    x: 480.0
+    y: 270.0
+  }
+  component_properties {
+    id: "script"
+    properties {
+      id: "near_z"
+      value: "-10.0"
+      type: PROPERTY_TYPE_NUMBER
+    }
+    properties {
+      id: "far_z"
+      value: "10.0"
+      type: PROPERTY_TYPE_NUMBER
+    }
+    properties {
+      id: "projection"
+      value: "FIXED_AUTO"
+      type: PROPERTY_TYPE_HASH
+    }
+  }
+}
+instances {
+  id: "Ground1"
+  prototype: "/assets/prefabs/go/collision/Ground.go"
+  position {
+    x: 976.0
+    y: 338.0
+  }
+  rotation {
+    z: 0.70710677
+    w: 0.70710677
+  }
+}
+instances {
+  id: "Ground2"
+  prototype: "/assets/prefabs/go/collision/Ground.go"
+  position {
+    x: -5.0
+    y: 291.0
+  }
+  rotation {
+    z: 0.70710677
+    w: 0.70710677
+  }
+}
+scale_along_z: 0
+embedded_instances {
+  id: "ui"
+  data: "components {\n"
+  "  id: \"game\"\n"
+  "  component: \"/game/game.gui\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "logic"
+  data: "components {\n"
+  "  id: \"game\"\n"
+  "  component: \"/game/game.script\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "prefabs"
+  data: "embedded_components {\n"
+  "  id: \"test\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/assets/prefabs/go/test.go\\\"\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"player\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/assets/prefabs/go/player.go\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
+}

@@ -1,0 +1,71 @@
+script: "/game/game.gui_script"
+fonts {
+  name: "myFont"
+  font: "/assets/myFont.font"
+}
+textures {
+  name: "UI"
+  texture: "/assets/ui/UI.atlas"
+}
+textures {
+  name: "game"
+  texture: "/assets/game/game.atlas"
+}
+nodes {
+  position {
+    x: 480.0
+    y: 270.0
+  }
+  size {
+    x: 960.0
+    y: 540.0
+  }
+  type: TYPE_BOX
+  id: "root"
+  adjust_mode: ADJUST_MODE_STRETCH
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+  visible: false
+}
+nodes {
+  position {
+    y: 270.0
+  }
+  size {
+    x: 200.0
+    y: 10.0
+  }
+  type: TYPE_BOX
+  id: "box"
+  yanchor: YANCHOR_TOP
+  pivot: PIVOT_N
+  parent: "root"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: -270.0
+  }
+  size {
+    x: 200.0
+    y: 10.0
+  }
+  type: TYPE_BOX
+  id: "box1"
+  yanchor: YANCHOR_TOP
+  pivot: PIVOT_S
+  parent: "root"
+  inherit_alpha: true
+  size_mode: SIZE_MODE_AUTO
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT
+particlefxs {
+  name: "snow"
+  particlefx: "/assets/prefabs/snow.particlefx"
+}
+materials {
+  name: "gui_layer_befor_go"
+  material: "/project_settings/gui_layer_befor_go.material"
+}

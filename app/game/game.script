@@ -1,0 +1,66 @@
+local ____exports = {}
+local ____ECS = require("ecs.core.ECS")
+local ecs = ____ECS.ecs
+local flow = require("ludobits.m.flow")
+local ____Game = require("game.core.Game")
+local Game = ____Game.Game
+function ____exports.init(self)
+    msg.post("@system:", "toggle_physics_debug")
+    Manager.init_script()
+    msg.post(".", "acquire_input_focus")
+    self.game = Game()
+    ecs.systems.init(
+        ecs,
+        self.game.register_ecs_systems()
+    )
+    self.main_thread = flow.start(
+        function()
+            self.game.init()
+            EventBus.on(
+                "RAW_INPUT",
+                function(____bindingPattern0)
+                    local action
+                    local action_id
+                    action_id = ____bindingPattern0.action_id
+                    action = ____bindingPattern0.action
+                    return ecs.input(action_id, action)
+                end
+            )
+            EventBus.on(
+                "UPDATE",
+                function(____bindingPattern0)
+                    local dt
+                    dt = ____bindingPattern0.dt
+                    return ecs.update(dt)
+                end
+            )
+            while true do
+                local message_id, _message, sender = flow.until_any_message()
+                EventBus.on_message(nil, message_id, _message, sender)
+            end
+        end,
+        {}
+    )
+end
+function ____exports.on_message(self, message_id, message, sender)
+    flow.on_message(message_id, message, sender)
+end
+function ____exports.update(self, dt)
+    EventBus.trigger("UPDATE", {dt = dt})
+end
+function ____exports.on_input(self, action_id, action)
+    if action_id == ID_MESSAGES.MSG_TOUCH then
+        msg.post(".", action_id, action)
+    end
+    EventBus.trigger("RAW_INPUT", {action_id = action_id, action = action})
+end
+function ____exports.final(self)
+    Manager.final_script()
+    flow.stop()
+end
+init = ____exports.init
+on_message = ____exports.on_message
+update = ____exports.update
+on_input = ____exports.on_input
+final = ____exports.final
+

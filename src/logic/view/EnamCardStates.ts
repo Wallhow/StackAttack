@@ -1,0 +1,12 @@
+export enum EnamCardStates {
+    NONE,
+    OPENED,
+
+    STOPKA,
+    HOME_1, HOME_2, HOME_3, HOME_4,
+    FREE_CELL_1, FREE_CELL_2, FREE_CELL_3, FREE_CELL_4,
+    STACK_1, STACK_2, STACK_3, STACK_4, STACK_5, STACK_6, STACK_7,
+    STACK_8, STACK_9, STACK_10,
+    JOKERS,
+    MOVABLE
+}

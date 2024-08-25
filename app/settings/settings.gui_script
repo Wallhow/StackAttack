@@ -1,0 +1,94 @@
+local ____lualib = require("lualib_bundle")
+local __TS__ArrayPushArray = ____lualib.__TS__ArrayPushArray
+local ____exports = {}
+local druid = require("druid.druid")
+local ____SelectorGroup = require("settings.SelectorGroup")
+local SelectorGroup = ____SelectorGroup.SelectorGroup
+local ____settings_utility = require("utils.settings_utility")
+local apply_settings = ____settings_utility.apply_settings
+local ____array = require("utils.array")
+local array = ____array.array
+local ____Header = require("general_components.Header")
+local Header = ____Header.Header
+function ____exports.init(self)
+    Manager.init_script()
+    self.druid = druid.new(self)
+    local header = Header(self.druid)
+    header.set_name(Lang.get_text("settings")).set_btn_callback(function()
+        Ads.show_interstitial()
+        Scene.load("menu")
+    end)
+    local druidComps = {}
+    local selector_nodes = {}
+    self.init_ui = function()
+        if #druidComps ~= 0 then
+            for ____, n in ipairs(druidComps) do
+                self.druid:remove(n)
+            end
+        end
+        array.clear(druidComps)
+        if #selector_nodes ~= 0 then
+            for ____, n in ipairs(selector_nodes) do
+                gui.delete_node(n)
+            end
+        end
+        array.clear(selector_nodes)
+        apply_settings()
+        local groups = {}
+        groups[#groups + 1] = SelectorGroup(self.druid, "bg_image", {
+            0,
+            1,
+            2,
+            3,
+            4
+        }, {
+            "patt1",
+            "patt2",
+            "patt3",
+            "patt4",
+            "cir_btn"
+        })
+        groups[#groups + 1] = SelectorGroup(
+            self.druid,
+            "color_bg",
+            {0, 1, 2, 3},
+            {"color1", "color2", "color3", "color4"},
+            {is_bg_disabled = true, icon_scale = 0.83}
+        )
+        groups[#groups + 1] = SelectorGroup(
+            self.druid,
+            "pack",
+            {0, 1, 2},
+            {"pack_1", "pack_2", "pack_3"},
+            {icon_scale = 1, is_bg_disabled = true}
+        )
+        for ____, g in ipairs(groups) do
+            g.on(function() return apply_settings() end)
+            __TS__ArrayPushArray(druidComps, g.druid_nodes)
+            __TS__ArrayPushArray(selector_nodes, g.nodes)
+        end
+        header.on_change_layout()
+    end
+    self:init_ui()
+end
+function ____exports.on_input(self, action_id, action)
+    return self.druid:on_input(action_id, action)
+end
+function ____exports.update(self, dt)
+    self.druid:update(dt)
+end
+function ____exports.on_message(self, message_id, message, sender)
+    self.druid:on_message(message_id, message, sender)
+    if message_id == hash("layout_changed") then
+        self:init_ui()
+    end
+end
+function ____exports.final(self)
+    self.druid:final()
+end
+init = ____exports.init
+on_input = ____exports.on_input
+update = ____exports.update
+on_message = ____exports.on_message
+final = ____exports.final
+
